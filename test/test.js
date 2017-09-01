@@ -1,55 +1,64 @@
-const fs = require("mz/fs");
+const expect = require("chai").expect;
+const fs = require("fs");
 const oftjsrt = require("../oftjsrt.js");
 const P = require("path");
-const should = require("should");
 
 describe("Parser", function() {
+	function parseBC(name) {
+		const path = P.join(__dirname, name + ".anfir");
+		const buffer = new Uint8Array(fs.readFileSync(path)).buffer;
+		return oftjsrt.parse(buffer);
+	}
+
 	it("exists", function() {
-		oftjsrt.parse.should.be.a.Function();
+		expect(oftjsrt.parse).to.be.a("function");
 	});
 	it("works for an empty bytecode", function() {
-		return parseBC("empty").then(function(mods) {
-			mods.length.should.equal(0);
-		});
+		const mods = parseBC("empty");
+		expect(mods.length).to.equal(0);
 	});
 	it("works for hello world", function() {
-		return parseBC("hello").then(function(mods) {
-			// Check the number of modules.
-			mods.length.should.equal(1);
-			const mod = mods[0];
+		const mods = parseBC("hello");
 
-			// Check the module name.
-			Symbol.keyFor(mod.name).should.equal("std/internal/examples/hello-world");
+		// Check the number of modules.
+		expect(mods.length).to.equal(1);
+		const mod = mods[0];
 
-			// Check the module exports.
-			mod.exports.length.should.equal(1);
-			mod.exports.map(Symbol.keyFor).should.match(["main"]);
+		// Check the module name.
+		expect(Symbol.keyFor(mod.name)).to.equal("std/internal/examples/hello-world");
 
-			// Check the module imports.
-			mod.imports.length.should.equal(0);
+		// Check the module exports.
+		expect(mod.exports.length).to.equal(1);
+		expect(mod.exports.map(Symbol.keyFor)).to.deep.equal(["main"]);
 
-			// Check the number of decls.
-			mod.decls.length.should.equal(1);
-			const decl = mod.decls[0];
+		// Check the module imports.
+		expect(mod.imports.length).to.equal(0);
 
-			// Check that the decoded expression is correct.
-			//
-			// In general, this is a bad idea, as it precludes optimizations
-			// performed by the initial compiler. However, the hello world
-			// example is simple enough that no optimizations should affect it.
-			decl.should.match(new oftjsrt.ast.Decl(Symbol.for("main"),
-				new oftjsrt.ast.PrimFn(Symbol.for("main"),
-					new oftjsrt.ast.Args([], [], null),
-					new oftjsrt.ast.ExprCall(
-						new oftjsrt.ast.PrimVar(Symbol.for("println")),
-						[new oftjsrt.ast.LiteralString("Hello, world!")]))));
-		});
+		// Check the number of decls.
+		expect(mod.decls.length).to.equal(1);
+		const decl = mod.decls[0];
+
+		// Check that the decoded expression is correct.
+		//
+		// In general, this is a bad idea, as it precludes optimizations
+		// performed by the initial compiler. However, the hello world
+		// example is simple enough that no optimizations should affect it.
+		expect(decl).to.deep.equal(new oftjsrt.ast.Decl(Symbol.for("main"),
+			new oftjsrt.ast.PrimFn(Symbol.for("main"),
+				new oftjsrt.ast.Args([], [], null),
+				new oftjsrt.ast.ExprCall(
+					new oftjsrt.ast.PrimVar(Symbol.for("println")),
+					[new oftjsrt.ast.LiteralString("Hello, world!")]))));
 	});
 });
 
-function parseBC(name) {
-	const path = P.join(__dirname, name + ".anfir");
-	return fs.readFile(path)
-		.then(file => file.buffer)
-		.then(oftjsrt.parse);
-}
+describe("Context", function() {
+	it("exists", function() {
+		expect(oftjsrt.Context).to.exist;
+	});
+	describe("Prime Sieve", function() {
+		it("works", function() {
+			const ctx = new oftjsrt.Context();
+		});
+	});
+});

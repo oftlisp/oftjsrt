@@ -1,21 +1,19 @@
 import { Args, Decl, ExprCall, LiteralByte, LiteralCons, LiteralFixnum,
 	LiteralNil, LiteralString, LiteralSymbol, Module, PrimFn, PrimVar } from "./ast.js";
 import { bytesToSymbol } from "./bytes.js";
-import Cursor from "./parse/cursor.js";
-import ParseError from "./parse/error.js";
+import Cursor from "./parser/cursor.js";
+import ParseError from "./parser/error.js";
 
-export function parse(arrayBuffer) {
+export default function parse(arrayBuffer) {
 	const bytecode = new DataView(arrayBuffer);
-	return new Promise(function(resolve, reject) {
-		checkHeaderMagic(bytecode, reject);
-		const cursor = new Cursor(bytecode, 16);
-		const modules = cursor.readMany(readModule);
-		cursor.mustEof();
-		resolve(modules);
-	});
+	checkHeaderMagic(bytecode);
+	const cursor = new Cursor(bytecode, 16);
+	const modules = cursor.readMany(readModule);
+	cursor.mustEof();
+	return modules;
 }
 
-function checkHeaderMagic(bytecode, reject) {
+function checkHeaderMagic(bytecode) {
 	// The header magic is "oftlisp anfirbc\0".
 	const magic = [0x6f, 0x66, 0x74, 0x6c, 0x69, 0x73, 0x70, 0x20, 0x61, 0x6e,
 		0x66, 0x69, 0x72, 0x62, 0x63, 0x00];
@@ -23,7 +21,7 @@ function checkHeaderMagic(bytecode, reject) {
 		const w = magic[i];
 		const g = bytecode.getUint8(i);
 		if(w !== g) {
-			reject(new ParseError("BADMAGIC", i, "The header magic was invalid"));
+			throw new ParseError("BADMAGIC", i, "The header magic was invalid");
 		}
 	}
 }

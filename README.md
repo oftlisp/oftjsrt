@@ -2,8 +2,6 @@
 
 A Javascript runtime for the bytecode produced by `oftb compile -f anfir`.
 
-Based on the CESK interpreter described by Matt Might [here](http://matt.might.net/articles/cesk-machines/).
-
 ## Usage
 
 ```javascript
@@ -28,6 +26,10 @@ runtime.call("github.com/my/cool/module", "function-name").then(function(value) 
 
 ## Required Features
 
+ - [Promise](https://caniuse.com/#feat=promises)
  - [TextDecoder](https://caniuse.com/#feat=textencoder)
 
 Currently, TextDecoder is polyfilled via `fast-text-encoding`.
+
+Due to their ubiquity, Promises are not polyfilled.
+Any Promise implementation that implements the Promises/A+ spec will work.

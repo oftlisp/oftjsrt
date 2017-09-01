@@ -1,4 +1,5 @@
 import * as ast from "./ast.js";
-import { parse } from "./parser.js";
+import Context from "./context.js";
+import parse from "./parser.js";
 
-export { ast, parse };
+export { ast, Context, parse };

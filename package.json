@@ -20,7 +20,9 @@
   },
   "scripts": {
     "build": "rollup --config",
-    "test": "mocha"
+    "test": "mocha",
+    "watch-build": "rollup --config --watch",
+    "watch-test": "mocha --watch"
   },
   "version": "1.0.0"
 }

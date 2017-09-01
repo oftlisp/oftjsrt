@@ -8,7 +8,14 @@ describe("Parser", function() {
 		oftjsrt.parse.should.be.a.Function();
 	});
 	it("works for an empty bytecode", function() {
-		return parseBC("empty");
+		return parseBC("empty").then(function(mods) {
+			mods.length.should.equal(0);
+		});
+	});
+	it("works for hello world", function() {
+		return parseBC("hello").then(function(mods) {
+			mods.length.should.equal(0);
+		});
 	});
 });
 

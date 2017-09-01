@@ -1,3 +1,5 @@
+import { Context, ValueSymbol } from "./ast.js";
+
 export function parse(arrayBuffer, ast) {
 	const bytecode = new DataView(arrayBuffer);
 	return new Promise(function(resolve, reject) {
@@ -24,7 +26,7 @@ export class ParseError extends Error {
 	}
 
 	toString() {
-		let str = "[" + this.type + "] " + this.msg + " (at byte " + this.pos + ")";
+		let str = "[" + this.type + "] " + this.msg + " (" + this.pos + " bytes in)";
 		if(this.next) {
 			str += "\n";
 			str += this.next.toString();
@@ -173,7 +175,7 @@ function parseValue(bytecode, pos, reject, ast) {
 }
 
 function parseSymbol(bytecode, pos, reject, ast) {
-	const ctor = (s, reject) => ast.symbol(s, reject);
+	const ctor = (s, reject) => ValueSymbol(s, reject);
 	return parseStringish(bytecode, pos, ctor, reject);
 }
 

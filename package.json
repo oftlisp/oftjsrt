@@ -1,6 +1,9 @@
 {
   "author": "Nathan Ringo <remexre@gmail.com>",
   "description": "A Javascript runtime for the bytecode produced by oftb compile -f anfir.",
+  "dependencies": {
+    "fast-text-encoding": "^1.0.0"
+  },
   "devDependencies": {
     "mocha": "^3.5.0",
     "mz": "^2.6.0",

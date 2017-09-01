@@ -28,7 +28,6 @@ runtime.call("github.com/my/cool/module", "function-name").then(function(value) 
 
 ## Required Features
 
- - [fetch](https://caniuse.com/#feat=fetch)
  - [TextDecoder](https://caniuse.com/#feat=textencoder)
 
-Polyfills exist for both of these features, but on Chrome or Firefox, you're fine.
+Currently, TextDecoder is polyfilled via `fast-text-encoding`.

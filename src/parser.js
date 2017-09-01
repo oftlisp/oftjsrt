@@ -1,4 +1,6 @@
-import { Decl, Module } from "./ast.js";
+import { Args, Decl, ExprCall, LiteralByte, LiteralCons, LiteralFixnum,
+	LiteralNil, LiteralString, LiteralSymbol, Module, PrimFn, PrimVar } from "./ast.js";
+import { bytesToSymbol } from "./bytes.js";
 import Cursor from "./parse/cursor.js";
 import ParseError from "./parse/error.js";
 
@@ -41,6 +43,75 @@ function readModule(cursor) {
 
 function readDecl(cursor) {
 	const name = cursor.readSymbol();
-	const expr = []; // TODO
+	const expr = readExpr(cursor);
 	return new Decl(name, expr);
+}
+
+function readExpr(cursor) {
+	const type = cursor.readByte();
+	if(type === 0x10) {
+		const fn = readExpr(cursor);
+		const args = cursor.readMany(readExpr);
+		return new ExprCall(fn, args);
+	} else {
+		return readPrim(cursor.back());
+	}
+}
+
+function readPrim(cursor) {
+	const type = cursor.readByte();
+	if(type === 0x08) {
+		const args = readArgs(cursor);
+		const body = readExpr(cursor);
+		return new PrimFn(null, args, body);
+	} else if(type === 0x09) {
+		const name = cursor.readSymbol();
+		const args = readArgs(cursor);
+		const body = readExpr(cursor);
+		return new PrimFn(name, args, body);
+	} else if(type === 0x0a) {
+		return new PrimVar(cursor.readSymbol());
+	} else if(type === 0x0b) {
+		throw new Error("TODO 11");
+	} else {
+		return readValue(cursor.back());
+	}
+}
+
+function readArgs(cursor) {
+	function readOptional(cursor) {
+		const name = cursor.readSymbol();
+		const defV = readValue(cursor);
+		return [name, defV];
+	}
+
+	const required = cursor.readMany(c => c.readSymbol());
+	const optional = cursor.readMany(readOptional);
+	const restBytes = cursor.readBytes();
+	let rest = null;
+	if(restBytes.byteLength > 0) {
+		rest = bytesToSymbol(restBytes);
+	}
+	return new Args(required, optional, rest);
+}
+
+function readValue(cursor) {
+	const type = cursor.readByte();
+	if(type === 0x00) {
+		return new LiteralNil();
+	} else if(type === 0x01) {
+		const head = readValue(cursor);
+		const tail = readValue(cursor);
+		return new LiteralCons(head, tail);
+	} else if(type === 0x02) {
+		return new LiteralSymbol(cursor.readSymbol());
+	} else if(type === 0x03) {
+		return new LiteralString(cursor.readString());
+	} else if(type === 0x04) {
+		return new LiteralByte(cursor.readByte());
+	} else if(type === 0x05) {
+		return new LiteralFixnum(cursor.readWord());
+	} else {
+		throw new Error("TODO readValue " + type);
+	}
 }

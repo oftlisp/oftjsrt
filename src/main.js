@@ -1,3 +1,4 @@
+import * as ast from "./ast.js";
 import { parse } from "./parser.js";
 
-export { parse };
+export { ast, parse };

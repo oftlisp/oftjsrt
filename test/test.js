@@ -37,7 +37,12 @@ describe("Parser", function() {
 			// In general, this is a bad idea, as it precludes optimizations
 			// performed by the initial compiler. However, the hello world
 			// example is simple enough that no optimizations should affect it.
-			// TODO
+			decl.should.match(new oftjsrt.ast.Decl(Symbol.for("main"),
+				new oftjsrt.ast.PrimFn(Symbol.for("main"),
+					new oftjsrt.ast.Args([], [], null),
+					new oftjsrt.ast.ExprCall(
+						new oftjsrt.ast.PrimVar(Symbol.for("println")),
+						[new oftjsrt.ast.LiteralString("Hello, world!")]))));
 		});
 	});
 });

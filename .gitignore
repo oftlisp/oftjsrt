@@ -3,6 +3,7 @@
 !.gitignore
 
 *.anfir
+npm-debug.log
 
 /node_modules/
 /oftjsrt.js

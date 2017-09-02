@@ -57,8 +57,11 @@ describe("Context", function() {
 		expect(oftjsrt.Context).to.exist;
 	});
 	describe("Prime Sieve", function() {
-		it("works", function() {
-			const ctx = new oftjsrt.Context();
+		const ctx = new oftjsrt.Context();
+		it("can be loaded", function() {
+			const path = P.join(__dirname, "prime-sieve.anfir");
+			const buffer = new Uint8Array(fs.readFileSync(path)).buffer;
+			ctx.loadBytecode(buffer);
 		});
 	});
 });
